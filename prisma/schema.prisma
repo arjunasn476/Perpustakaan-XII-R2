@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MURID
+}
+
+model User {
+  id          Int          @id @default(autoincrement())
+  nama        String
+  email       String       @unique
+  password    String
+  role        Role         @default(MURID)
+  peminjaman  Peminjaman[]
+  createdAt   DateTime     @default(now())
+}
+
+model Buku {
+  id          Int          @id @default(autoincrement())
+  judul       String
+  penulis     String
+  stok        Int          @default(1)
+  peminjaman  Peminjaman[]
+  createdAt   DateTime     @default(now())
+}
+
+model Peminjaman {
+  id           Int       @id @default(autoincrement())
+  userId       Int
+  user         User      @relation(fields: [userId], references: [id])
+  bukuId       Int
+  buku         Buku      @relation(fields: [bukuId], references: [id])
+  tglPinjam    DateTime  @default(now())
+  tglKembali   DateTime?
+  status       String    @default("DIPINJAM")
+}
